@@ -300,7 +300,7 @@ ID,Name,Quantity,Price
 
 ## 🏗️ Architecture
 
-### Project Structure
+### Project Current Structure
 
 ```
 stockflow/
@@ -316,8 +316,6 @@ stockflow/
 ├── obj/                   # Compiled object files (generated)
 ├── bin/                   # Executable output (generated)
 ├── tests/                 # Unit tests (coming soon)
-├── docs/                  # Documentation
-├── scripts/               # Installation and utility scripts
 ├── Makefile              # Build configuration
 └── README.md             # This file
 ```

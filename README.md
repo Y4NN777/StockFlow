@@ -2,6 +2,9 @@
 
 <div align="center">
 
+![image](https://github.com/user-attachments/assets/5b1d33db-0deb-4dea-bec9-1526c46799e9)
+
+
 ![StockFlow Logo](https://img.shields.io/badge/StockFlow-Professional%20Inventory-blue?style=for-the-badge)
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/stockflow/stockflow)

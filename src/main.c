@@ -5,182 +5,221 @@
 #include "utils.h"
 
 static void on_window_destroy(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
-    (void)data;   // Suppress unused parameter warning
+    (void)widget;
+    (void)data;
     gtk_main_quit();
 }
 
 static void setup_css() {
     GtkCssProvider *provider = gtk_css_provider_new();
-    const char *css_data = 
-        /* StockFlow Brand Colors */
-        "window { "
-        "    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); "
-        "    color: #2c3e50; "
+    
+    const char *css_style = 
+        "/* Base styling */"
+        "window {"
+        "    background-color: #f0f2f5;"
+        "    color: #212529;"
+        "    font-family: 'Segoe UI', sans-serif;"
         "}"
-        
-        /* Main content area */
-        ".main-content { "
-        "    background-color: rgba(255, 255, 255, 0.95); "
-        "    border-radius: 12px; "
-        "    margin: 8px; "
-        "    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2); "
+        ""
+        "/* Header with proper contrast */"
+        ".app-header {"
+        "    background: linear-gradient(135deg, #1e40af, #3b82f6);"
+        "    color: white;"
+        "    padding: 16px 20px;"
+        "    font-size: 20px;"
+        "    font-weight: bold;"
+        "    border-radius: 8px 8px 0 0;"
         "}"
-        
-        /* Header/Title area */
-        ".app-header { "
-        "    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); "
-        "    color: white; "
-        "    padding: 16px 20px; "
-        "    border-radius: 12px 12px 0 0; "
-        "    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.3); "
+        ""
+        "/* Section titles - Large & Bold */"
+        ".section-title {"
+        "    font-size: 22px;"
+        "    font-weight: bold;"
+        "    color: white;"
+        "    margin: 8px 0;"
         "}"
-        
-        ".app-title { "
-        "    font-size: 24px; "
-        "    font-weight: bold; "
-        "    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); "
+        ""
+        "/* App subtitle */"
+        ".app-subtitle {"
+        "    font-size: 14px;"
+        "    color: rgba(255, 255, 255, 0.9);"
+        "    margin-top: 4px;"
         "}"
-        
-        ".app-subtitle { "
-        "    font-size: 12px; "
-        "    opacity: 0.9; "
-        "    margin-top: 4px; "
+        ""
+        "/* Form labels - Medium weight */"
+        ".form-label {"
+        "    font-size: 14px;"
+        "    font-weight: 600;"
+        "    color: #374151;"
+        "    margin-right: 8px;"
         "}"
-        
-        /* Toolbar */
-        ".toolbar { "
-        "    background: linear-gradient(to bottom, #f8f9ff, #e3e7ff); "
-        "    padding: 8px 16px; "
-        "    border-bottom: 1px solid #d1d9ff; "
+        ""
+        "/* Regular text */"
+        ".regular-text {"
+        "    font-size: 13px;"
+        "    font-weight: normal;"
+        "    color: #6b7280;"
         "}"
-        
-        /* Buttons with StockFlow branding */
-        "button { "
-        "    margin: 3px; "
-        "    padding: 8px 16px; "
-        "    border-radius: 6px; "
-        "    border: none; "
-        "    font-weight: 500; "
-        "    transition: all 0.2s ease; "
+        ""
+        "/* Buttons with consistent styling */"
+        "button {"
+        "    background: linear-gradient(135deg, #3b82f6, #1d4ed8);"
+        "    color: white;"
+        "    border: none;"
+        "    border-radius: 6px;"
+        "    padding: 10px 18px;"
+        "    font-size: 14px;"
+        "    font-weight: 600;"
+        "    min-height: 38px;"
+        "    transition: all 0.2s ease;"
         "}"
-        
-        "button:not(.toolbar button) { "
-        "    background: linear-gradient(135deg, #667eea, #764ba2); "
-        "    color: white; "
-        "    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); "
+        ""
+        "button:hover {"
+        "    background: linear-gradient(135deg, #2563eb, #1e40af);"
+        "    transform: translateY(-1px);"
+        "    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);"
         "}"
-        
-        "button:hover:not(.toolbar button) { "
-        "    background: linear-gradient(135deg, #5a6fd8, #6a4190); "
-        "    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); "
-        "    transform: translateY(-1px); "
+        ""
+        "button:active {"
+        "    transform: translateY(0);"
+        "    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);"
         "}"
-        
-        "button:active:not(.toolbar button) { "
-        "    transform: translateY(0); "
-        "    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3); "
+        ""
+        "/* Toolbar buttons - lighter style */"
+        ".toolbar button {"
+        "    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);"
+        "    color: #475569;"
+        "    border: 1px solid #cbd5e1;"
+        "    font-weight: 500;"
         "}"
-        
-        /* Toolbar buttons */
-        ".toolbar button { "
-        "    background: linear-gradient(to bottom, #ffffff, #f0f2ff); "
-        "    border: 1px solid #c7d2fe; "
-        "    color: #4338ca; "
+        ""
+        ".toolbar button:hover {"
+        "    background: linear-gradient(to bottom, #e2e8f0, #cbd5e1);"
+        "    color: #334155;"
+        "    transform: none;"
+        "    box-shadow: none;"
         "}"
-        
-        ".toolbar button:hover { "
-        "    background: linear-gradient(to bottom, #f0f2ff, #e0e7ff); "
-        "    border-color: #a5b4fc; "
+        ""
+        "/* Input fields with visible text */"
+        "entry {"
+        "    background-color: white;"
+        "    color: #1f2937;"
+        "    border: 2px solid #d1d5db;"
+        "    border-radius: 6px;"
+        "    padding: 10px 14px;"
+        "    font-size: 14px;"
+        "    min-height: 22px;"
         "}"
-        
-        /* Input fields */
-        "entry { "
-        "    border: 2px solid #e5e7eb; "
-        "    border-radius: 6px; "
-        "    padding: 8px 12px; "
-        "    background: white; "
-        "    transition: border-color 0.2s ease; "
+        ""
+        "entry:focus {"
+        "    border-color: #3b82f6;"
+        "    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);"
+        "    outline: none;"
         "}"
-        
-        "entry:focus { "
-        "    border-color: #667eea; "
-        "    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); "
+        ""
+        "/* Force visible text in entries */"
+        "entry text {"
+        "    color: #1f2937 !important;"
         "}"
-        
-        /* Search entry special styling */
-        ".search-entry { "
-        "    background: linear-gradient(to right, #ffffff, #f8fafc); "
-        "    border: 2px solid #cbd5e1; "
-        "    border-radius: 20px; "
-        "    padding: 10px 16px; "
+        ""
+        "entry placeholder {"
+        "    color: #9ca3af;"
+        "    font-style: italic;"
         "}"
-        
-        ".search-entry:focus { "
-        "    border-color: #667eea; "
-        "    background: white; "
+        ""
+        "/* TreeView styling */"
+        "treeview {"
+        "    background-color: white;"
+        "    color: #1f2937;"
+        "    border: 1px solid #d1d5db;"
+        "    font-size: 13px;"
+        "    border-radius: 6px;"
         "}"
-        
-        /* TreeView */
-        "treeview { "
-        "    background: white; "
-        "    border: 1px solid #e5e7eb; "
-        "    border-radius: 6px; "
+        ""
+        "treeview:selected {"
+        "    background-color: #3b82f6;"
+        "    color: white;"
         "}"
-        
-        "treeview header button { "
-        "    background: linear-gradient(to bottom, #f8fafc, #f1f5f9); "
-        "    border: none; "
-        "    border-right: 1px solid #e2e8f0; "
-        "    color: #475569; "
-        "    font-weight: 600; "
-        "    padding: 12px 8px; "
+        ""
+        "/* Table headers - bold and styled */"
+        "treeview header button {"
+        "    background: linear-gradient(to bottom, #f9fafb, #f3f4f6);"
+        "    color: #374151;"
+        "    border: 1px solid #d1d5db;"
+        "    font-weight: bold;"
+        "    font-size: 12px;"
+        "    text-transform: uppercase;"
+        "    letter-spacing: 0.5px;"
+        "    padding: 10px 8px;"
         "}"
-        
-        "treeview header button:hover { "
-        "    background: linear-gradient(to bottom, #e2e8f0, #cbd5e1); "
+        ""
+        "treeview header button:hover {"
+        "    background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);"
         "}"
-        
-        /* Input frame */
-        ".input-frame { "
-        "    margin: 16px; "
-        "    padding: 20px; "
-        "    background: linear-gradient(135deg, #ffffff, #f8fafc); "
-        "    border-radius: 8px; "
-        "    border: 1px solid #e2e8f0; "
-        "    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); "
+        ""
+        "/* Status bar with white text */"
+        ".status-bar {"
+        "    background: linear-gradient(135deg, #374151, #4b5563);"
+        "    color: white;"
+        "    padding: 10px 16px;"
+        "    font-size: 13px;"
+        "    font-weight: 500;"
+        "    border-radius: 0 0 8px 8px;"
         "}"
-        
-        ".input-frame label { "
-        "    color: #374151; "
-        "    font-weight: 600; "
-        "    font-size: 14px; "
+        ""
+        "/* Labels with hierarchy */"
+        "label {"
+        "    color: #374151;"
+        "    font-size: 14px;"
         "}"
-        
-        /* Status bar with StockFlow branding */
-        ".status-bar { "
-        "    background: linear-gradient(135deg, #667eea, #764ba2); "
-        "    color: white; "
-        "    padding: 8px 16px; "
-        "    border-radius: 0 0 12px 12px; "
-        "    font-weight: 500; "
-        "    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); "
+        ""
+        "/* Input frame styling */"
+        ".input-frame {"
+        "    background-color: #f8f9fa;"
+        "    border: 1px solid #e9ecef;"
+        "    border-radius: 8px;"
+        "    padding: 4px;"
         "}"
-        
-        /* Scrolled windows */
-        "scrolledwindow { "
-        "    border-radius: 6px; "
-        "    border: 1px solid #e5e7eb; "
+        ""
+        ".input-frame > label {"
+        "    font-weight: bold;"
+        "    font-size: 16px;"
+        "    color: #495057;"
         "}"
-        
-        /* Frame titles */
-        "frame > label { "
-        "    color: #667eea; "
-        "    font-weight: bold; "
-        "    font-size: 16px; "
+        ""
+        "/* Toolbar styling */"
+        ".toolbar {"
+        "    background: linear-gradient(to bottom, #f8fafc, #f1f5f9);"
+        "    border-bottom: 1px solid #e2e8f0;"
+        "    padding: 8px 12px;"
+        "}"
+        ""
+        "/* Dialog styling */"
+        "dialog {"
+        "    background-color: white;"
+        "    color: #1f2937;"
+        "    border-radius: 8px;"
+        "    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);"
+        "}"
+        ""
+        "/* Message dialogs */"
+        "messagedialog {"
+        "    background-color: white;"
+        "}"
+        ""
+        "messagedialog label {"
+        "    color: #1f2937;"
+        "    font-size: 14px;"
+        "}"
+        ""
+        "/* Scrolled windows */"
+        "scrolledwindow {"
+        "    background-color: white;"
+        "    border: 1px solid #d1d5db;"
+        "    border-radius: 6px;"
         "}";
     
-    gtk_css_provider_load_from_data(provider, css_data, -1, NULL);
+    gtk_css_provider_load_from_data(provider, css_style, -1, NULL);
     gtk_style_context_add_provider_for_screen(
         gdk_screen_get_default(),
         GTK_STYLE_PROVIDER(provider),
@@ -192,26 +231,22 @@ static void setup_css() {
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
     
-    // Initialize application data
     AppData app_data = {0};
     Inventory inventory;
     inventory_init(&inventory);
     app_data.inventory = &inventory;
     app_data.selected_id = -1;
     
-    // Setup CSS
     setup_css();
     
-    // Create main window
     app_data.window = create_main_window(&app_data);
     g_signal_connect(app_data.window, "destroy", G_CALLBACK(on_window_destroy), NULL);
     
-    // Load existing inventory if available
     if (load_inventory_from_file(&inventory, "inventory.csv")) {
         refresh_tree_view(&app_data);
-        update_status(&app_data, "✅ StockFlow Ready - Inventory loaded successfully!");
+        update_status(&app_data, "Inventory loaded successfully!");
     } else {
-        update_status(&app_data, "🚀 StockFlow Ready - Welcome to Professional Inventory Management");
+        update_status(&app_data, "StockFlow Ready - Welcome!");
     }
     
     gtk_widget_show_all(app_data.window);

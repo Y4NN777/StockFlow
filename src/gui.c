@@ -4,6 +4,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Simple helper functions for styling (WORKING VERSIONS)
+static void apply_font(GtkWidget *widget, const char *font_description) {
+    if (widget && font_description) {
+        PangoFontDescription *font_desc = pango_font_description_from_string(font_description);
+        gtk_widget_override_font(widget, font_desc);
+        pango_font_description_free(font_desc);
+    }
+}
+
+static void set_white_text(GtkWidget *widget) {
+    if (widget) {
+        GdkRGBA white = {1.0, 1.0, 1.0, 1.0};
+        gtk_widget_override_color(widget, GTK_STATE_FLAG_NORMAL, &white);
+        gtk_widget_override_color(widget, GTK_STATE_FLAG_PRELIGHT, &white);
+        gtk_widget_override_color(widget, GTK_STATE_FLAG_ACTIVE, &white);
+    }
+}
+
+static void add_css_class(GtkWidget *widget, const char *class_name) {
+    if (widget && class_name) {
+        GtkStyleContext *context = gtk_widget_get_style_context(widget);
+        gtk_style_context_add_class(context, class_name);
+    }
+}
+
 GtkWidget* create_main_window(AppData *app_data) {
     // Create main window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -17,28 +42,28 @@ GtkWidget* create_main_window(AppData *app_data) {
     
     // Create branded header
     GtkWidget *header_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
-    GtkStyleContext *header_context = gtk_widget_get_style_context(header_box);
-    gtk_style_context_add_class(header_context, "app-header");
+    add_css_class(header_box, "app-header");
     gtk_box_pack_start(GTK_BOX(main_vbox), header_box, FALSE, FALSE, 0);
     
     // App title
     GtkWidget *title_label = gtk_label_new("StockFlow");
-    GtkStyleContext *title_context = gtk_widget_get_style_context(title_label);
-    gtk_style_context_add_class(title_context, "app-title");
+    add_css_class(title_label, "app-title");
+    apply_font(title_label, "Sans Bold 24");
+    set_white_text(title_label);
     gtk_widget_set_halign(title_label, GTK_ALIGN_CENTER);
     gtk_box_pack_start(GTK_BOX(header_box), title_label, FALSE, FALSE, 0);
     
     // App subtitle
     GtkWidget *subtitle_label = gtk_label_new("Professional Inventory Management System");
-    GtkStyleContext *subtitle_context = gtk_widget_get_style_context(subtitle_label);
-    gtk_style_context_add_class(subtitle_context, "app-subtitle");
+    add_css_class(subtitle_label, "app-subtitle");
+    apply_font(subtitle_label, "Sans 14");
+    set_white_text(subtitle_label);
     gtk_widget_set_halign(subtitle_label, GTK_ALIGN_CENTER);
     gtk_box_pack_start(GTK_BOX(header_box), subtitle_label, FALSE, FALSE, 0);
     
     // Create content container with rounded background
     GtkWidget *content_container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    GtkStyleContext *content_context = gtk_widget_get_style_context(content_container);
-    gtk_style_context_add_class(content_context, "main-content");
+    add_css_class(content_container, "main-content");
     gtk_box_pack_start(GTK_BOX(main_vbox), content_container, TRUE, TRUE, 0);
     
     // Setup toolbar
@@ -56,8 +81,7 @@ GtkWidget* create_main_window(AppData *app_data) {
     // Search entry with special styling
     app_data->search_entry = gtk_search_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(app_data->search_entry), "🔍 Search inventory items...");
-    GtkStyleContext *search_context = gtk_widget_get_style_context(app_data->search_entry);
-    gtk_style_context_add_class(search_context, "search-entry");
+    add_css_class(app_data->search_entry, "search-entry");
     g_signal_connect(app_data->search_entry, "search-changed", G_CALLBACK(on_search_entry_changed), app_data);
     gtk_box_pack_start(GTK_BOX(left_vbox), app_data->search_entry, FALSE, FALSE, 0);
     
@@ -74,11 +98,12 @@ GtkWidget* create_main_window(AppData *app_data) {
     gtk_paned_pack2(GTK_PANED(paned), right_vbox, FALSE, TRUE);
     setup_input_form(app_data, right_vbox);
     
-    // Status bar with StockFlow branding
+    // Status bar with StockFlow branding - FIXED FIELD NAME
     app_data->status_label = gtk_label_new("🚀 StockFlow Ready - Professional Inventory Management");
     gtk_widget_set_halign(app_data->status_label, GTK_ALIGN_START);
-    GtkStyleContext *status_context = gtk_widget_get_style_context(app_data->status_label);
-    gtk_style_context_add_class(status_context, "status-bar");
+    add_css_class(app_data->status_label, "status-bar");
+    apply_font(app_data->status_label, "Sans Semi-Bold 13");
+    set_white_text(app_data->status_label);
     gtk_box_pack_end(GTK_BOX(content_container), app_data->status_label, FALSE, FALSE, 0);
     
     app_data->window = window;
@@ -91,7 +116,6 @@ void setup_tree_view(AppData *app_data) {
     
     // Create tree view
     app_data->tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(app_data->list_store));
-    // Note: gtk_tree_view_set_rules_hint is deprecated in GTK3, removed for modern compatibility
     
     // Create columns
     const char *column_titles[] = {"ID", "Name", "Quantity", "Price"};
@@ -99,10 +123,10 @@ void setup_tree_view(AppData *app_data) {
     for (int i = 0; i < NUM_COLS; i++) {
         GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
         
-        // Simple cell renderer setup - no complex styling
+        // Simple cell renderer setup
         g_object_set(renderer, 
-                     "ypad", 4,     // Small padding
-                     "xpad", 6,     // Small padding
+                     "ypad", 4,
+                     "xpad", 6,
                      NULL);
         
         GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes(
@@ -113,9 +137,9 @@ void setup_tree_view(AppData *app_data) {
         gtk_tree_view_column_set_clickable(column, TRUE);
         gtk_tree_view_column_set_expand(column, TRUE);
         
-        // Only set alignment for price column
+        // Right align price column
         if (i == COL_PRICE) {
-            g_object_set(renderer, "xalign", 1.0, NULL); // Right align price
+            g_object_set(renderer, "xalign", 1.0, NULL);
         }
         
         gtk_tree_view_append_column(GTK_TREE_VIEW(app_data->tree_view), column);
@@ -130,8 +154,8 @@ void setup_tree_view(AppData *app_data) {
 
 void setup_input_form(AppData *app_data, GtkWidget *container) {
     GtkWidget *frame = gtk_frame_new("📝 Item Management");
-    GtkStyleContext *context = gtk_widget_get_style_context(frame);
-    gtk_style_context_add_class(context, "input-frame");
+    add_css_class(frame, "input-frame");
+    apply_font(gtk_frame_get_label_widget(GTK_FRAME(frame)), "Sans Bold 16");
     gtk_box_pack_start(GTK_BOX(container), frame, FALSE, TRUE, 0);
     
     GtkWidget *grid = gtk_grid_new();
@@ -142,6 +166,8 @@ void setup_input_form(AppData *app_data, GtkWidget *container) {
     
     // Name field
     GtkWidget *name_label = gtk_label_new("📦 Product Name:");
+    add_css_class(name_label, "form-label");
+    apply_font(name_label, "Sans Semi-Bold 14");
     gtk_widget_set_halign(name_label, GTK_ALIGN_END);
     app_data->name_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(app_data->name_entry), "Enter product name...");
@@ -150,6 +176,8 @@ void setup_input_form(AppData *app_data, GtkWidget *container) {
     
     // Quantity field
     GtkWidget *quantity_label = gtk_label_new("📊 Quantity:");
+    add_css_class(quantity_label, "form-label");
+    apply_font(quantity_label, "Sans Semi-Bold 14");
     gtk_widget_set_halign(quantity_label, GTK_ALIGN_END);
     app_data->quantity_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(app_data->quantity_entry), "Stock count...");
@@ -158,13 +186,15 @@ void setup_input_form(AppData *app_data, GtkWidget *container) {
     
     // Price field
     GtkWidget *price_label = gtk_label_new("💰 Price ($):");
+    add_css_class(price_label, "form-label");
+    apply_font(price_label, "Sans Semi-Bold 14");
     gtk_widget_set_halign(price_label, GTK_ALIGN_END);
     app_data->price_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(app_data->price_entry), "0.00");
     gtk_grid_attach(GTK_GRID(grid), price_label, 0, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), app_data->price_entry, 1, 2, 1, 1);
     
-    // Action buttons with icons
+    // Action buttons with styling
     GtkWidget *button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
     gtk_grid_attach(GTK_GRID(grid), button_box, 0, 3, 2, 1);
@@ -172,6 +202,15 @@ void setup_input_form(AppData *app_data, GtkWidget *container) {
     app_data->add_button = gtk_button_new_with_label("➕ Add Item");
     app_data->update_button = gtk_button_new_with_label("✏️ Update");
     app_data->delete_button = gtk_button_new_with_label("🗑️ Delete");
+    
+    // Apply button styling
+    set_white_text(app_data->add_button);
+    set_white_text(app_data->update_button);
+    set_white_text(app_data->delete_button);
+    
+    apply_font(app_data->add_button, "Sans Semi-Bold 14");
+    apply_font(app_data->update_button, "Sans Semi-Bold 14");
+    apply_font(app_data->delete_button, "Sans Semi-Bold 14");
     
     gtk_widget_set_sensitive(app_data->update_button, FALSE);
     gtk_widget_set_sensitive(app_data->delete_button, FALSE);
@@ -188,18 +227,17 @@ void setup_input_form(AppData *app_data, GtkWidget *container) {
 
 void setup_toolbar(AppData *app_data, GtkWidget *container) {
     GtkWidget *toolbar = gtk_toolbar_new();
-    GtkStyleContext *context = gtk_widget_get_style_context(toolbar);
-    gtk_style_context_add_class(context, "toolbar");
+    add_css_class(toolbar, "toolbar");
     gtk_box_pack_start(GTK_BOX(container), toolbar, FALSE, FALSE, 0);
     
-    // Save button with icon
+    // Save button
     GtkToolItem *save_item = gtk_tool_button_new(NULL, "💾 Save Inventory");
     gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(save_item), "document-save");
     gtk_widget_set_tooltip_text(GTK_WIDGET(save_item), "Save inventory to CSV file");
     g_signal_connect(save_item, "clicked", G_CALLBACK(on_save_clicked), app_data);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), save_item, -1);
     
-    // Load button with icon
+    // Load button
     GtkToolItem *load_item = gtk_tool_button_new(NULL, "📂 Load Inventory");
     gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(load_item), "document-open");
     gtk_widget_set_tooltip_text(GTK_WIDGET(load_item), "Load inventory from CSV file");
@@ -210,12 +248,12 @@ void setup_toolbar(AppData *app_data, GtkWidget *container) {
     GtkToolItem *sep = gtk_separator_tool_item_new();
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), sep, -1);
     
-    // Add branding info in toolbar
+    // Branding info
     GtkToolItem *brand_item = gtk_tool_item_new();
     GtkWidget *brand_label = gtk_label_new("StockFlow v1.0 - Professional Inventory Management");
-    gtk_widget_set_margin_start(brand_label, 20);  // Use modern GTK3 function
-    GtkStyleContext *brand_context = gtk_widget_get_style_context(brand_label);
-    gtk_style_context_add_class(brand_context, "app-subtitle");
+    gtk_widget_set_margin_start(brand_label, 20);
+    add_css_class(brand_label, "app-subtitle");
+    apply_font(brand_label, "Sans 12");
     gtk_container_add(GTK_CONTAINER(brand_item), brand_label);
     gtk_tool_item_set_expand(brand_item, TRUE);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), brand_item, -1);
@@ -288,7 +326,7 @@ void populate_input_fields(AppData *app_data, const InventoryItem *item) {
 
 // Signal handlers
 void on_add_button_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     
     const char *name = gtk_entry_get_text(GTK_ENTRY(app_data->name_entry));
@@ -325,7 +363,7 @@ void on_add_button_clicked(GtkWidget *widget, gpointer data) {
 }
 
 void on_update_button_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     
     if (app_data->selected_id == -1) {
@@ -355,7 +393,7 @@ void on_update_button_clicked(GtkWidget *widget, gpointer data) {
 }
 
 void on_delete_button_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     
     if (app_data->selected_id == -1) {
@@ -400,7 +438,7 @@ void on_tree_selection_changed(GtkTreeSelection *selection, gpointer data) {
 }
 
 void on_search_entry_changed(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     refresh_tree_view(app_data);
     
@@ -433,7 +471,7 @@ void on_column_header_clicked(GtkTreeViewColumn *column, gpointer data) {
 }
 
 void on_save_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     
     if (save_inventory_to_file(app_data->inventory, "inventory.csv")) {
@@ -445,7 +483,7 @@ void on_save_clicked(GtkWidget *widget, gpointer data) {
 }
 
 void on_load_clicked(GtkWidget *widget, gpointer data) {
-    (void)widget; // Suppress unused parameter warning
+    (void)widget;
     AppData *app_data = (AppData *)data;
     
     if (load_inventory_from_file(app_data->inventory, "inventory.csv")) {

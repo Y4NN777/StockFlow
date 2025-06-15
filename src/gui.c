@@ -98,16 +98,24 @@ void setup_tree_view(AppData *app_data) {
     
     for (int i = 0; i < NUM_COLS; i++) {
         GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+        
+        // Simple cell renderer setup - no complex styling
+        g_object_set(renderer, 
+                     "ypad", 4,     // Small padding
+                     "xpad", 6,     // Small padding
+                     NULL);
+        
         GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes(
             column_titles[i], renderer, "text", i, NULL);
         
         gtk_tree_view_column_set_resizable(column, TRUE);
         gtk_tree_view_column_set_sort_column_id(column, i);
         gtk_tree_view_column_set_clickable(column, TRUE);
+        gtk_tree_view_column_set_expand(column, TRUE);
         
-        // Format price column
+        // Only set alignment for price column
         if (i == COL_PRICE) {
-            g_object_set(renderer, "xalign", 1.0, NULL); // Right align
+            g_object_set(renderer, "xalign", 1.0, NULL); // Right align price
         }
         
         gtk_tree_view_append_column(GTK_TREE_VIEW(app_data->tree_view), column);
